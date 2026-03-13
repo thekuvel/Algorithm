@@ -5,7 +5,7 @@ let buildings = [
 ]
 
 function findMaxProfit(n) {
-  // Initialize array to capture profit, building built and remaining time
+  // Initialize array to capture profit, properties and remaining time left
   let profitArray = []
   let propertyArray = []
   let timeLeftArray = []
@@ -15,9 +15,8 @@ function findMaxProfit(n) {
   createNestedArrays(profitArray)
   createNestedArrays(propertyArray)
   createNestedArrays(timeLeftArray)
-  // console.log(profitArray)
 
-  // Iterate available time from backwards n to 1
+  // Find maxProfit at given time
   for (i = n; i > 0; i--) {
     let maxProfit = 0
 
@@ -35,23 +34,18 @@ function findMaxProfit(n) {
     })
   }
 
-  // Calculate max profit and display output
-  // console.log(profitArray, '\n', propertyArray, '\n', timeLeftArray)
+  // Calculate output array with earning and buildings
   let maxEarning = 0
   let outputArray = []
 
   profitArray.map((array, i) => {
     array.map((val, j) => {
       count = { T: 0, P: 0, C: 0 }
-      // console.log(val, timeLeftArray[i][j])
       let timeLeftArrayIndex = timeLeftArray[i][j] - 1
-      // console.log(val, i, j, timeLeftArrayIndex)
       if (timeLeftArrayIndex >= 0) {
-        // console.log(profitArray[timeLeftArrayIndex][j])
-        let earnings = val + (profitArray[timeLeftArrayIndex][j] || 0)
+        let earnings = val + (profitArray[timeLeftArrayIndex][j] || 0) // Add current building earning + future building earning
         if (earnings >= maxEarning) {
           maxEarning = earnings
-          // console.log(propertyArray[i][j], propertyArray[timeLeftArrayIndex][j])
           if (propertyArray[i][j]) {
             count[propertyArray[i][j]]++
           }
@@ -65,8 +59,9 @@ function findMaxProfit(n) {
     })
   })
 
-  let maxProfit = Math.max(...outputArray.map((val) => val.earning))
+  // Find maxearning and display output
 
+  let maxProfit = Math.max(...outputArray.map((val) => val.earning))
   let sol = outputArray.filter((val) => val.earning === maxProfit)
   console.log(sol)
 }
