@@ -4,67 +4,44 @@ let buildings = [
   { title: 'C', time: 10, earnings: 2000 },
 ]
 
-function findMaxProfit(n) {
-  // Initialize array to capture profit, properties and remaining time left
-  let profitArray = []
-  let propertyArray = []
-  let timeLeftArray = []
-  function createNestedArrays(array) {
-    for (i = 0; i < n; i++) array.push([])
-  }
-  createNestedArrays(profitArray)
-  createNestedArrays(propertyArray)
-  createNestedArrays(timeLeftArray)
+function findMaxProfit(totalTime) {
+  // Initilizing profit array pa
+  let pa = Array(totalTime + 1)
+    .fill(null)
+    .map(() => [])
 
-  // Find maxProfit at given time
-  for (i = n; i > 0; i--) {
-    let maxProfit = 0
+  pa[0].push({ earning: 0, count: { T: 0, P: 0, C: 0 } })
 
-    // for every val of n, i.e given time, find best building that earn max profit
-    buildings.map((b) => {
-      let remainingTime = i - b.time
-      let earnings = remainingTime * b.earnings
+  for (let t = 1; t <= totalTime; t++) {
+    for (let b of buildings) {
+      if (t >= b.time) {
+        let remainingTime = t - b.time
 
-      if (earnings > maxProfit || earnings == maxProfit) {
-        maxProfit = earnings
-        profitArray[i - 1].push(earnings)
-        propertyArray[i - 1].push(b.title)
-        timeLeftArray[i - 1].push(remainingTime)
-      }
-    })
-  }
+        // If remainingTime == 0, we can still build this building
+        if (pa[remainingTime].length === 0) {
+          pa[t].push({
+            earning: remainingTime * b.earnings,
+            count: { T: 0, P: 0, C: 0, [b.title]: 1 },
+          })
+        }
 
-  // Calculate output array with earning and buildings
-  let maxEarning = 0
-  let outputArray = []
-
-  profitArray.map((array, i) => {
-    array.map((val, j) => {
-      count = { T: 0, P: 0, C: 0 }
-      let timeLeftArrayIndex = timeLeftArray[i][j] - 1
-      if (timeLeftArrayIndex >= 0) {
-        let earnings = val + (profitArray[timeLeftArrayIndex][j] || 0) // Add current building earning + future building earning
-        if (earnings >= maxEarning) {
-          maxEarning = earnings
-          if (propertyArray[i][j]) {
-            count[propertyArray[i][j]]++
-          }
-          if (propertyArray[timeLeftArrayIndex][j]) {
-            count[propertyArray[timeLeftArrayIndex][j]]++
-          }
+        for (let prev of pa[remainingTime]) {
+          let earning = prev.earning + remainingTime * b.earnings
+          let count = { ...prev.count, [b.title]: prev.count[b.title] + 1 }
+          pa[t].push({ earning, count })
         }
       }
-      let output = { earning: maxEarning, count: count }
-      outputArray.push(output)
-    })
-  })
+    }
 
-  // Find maxearning and display output
+    if (pa[t].length > 0) {
+      let maxEarning = Math.max(...pa[t].map((s) => s.earning))
+      pa[t] = pa[t].filter((s) => s.earning === maxEarning)
+    }
+  }
 
-  let maxProfit = Math.max(...outputArray.map((val) => val.earning))
-  let sol = outputArray.filter((val) => val.earning === maxProfit)
-  console.log(sol)
+  console.log(`Max Profit: ${pa[totalTime][0].earning}`)
+  console.log('All optimal solutions:', pa[totalTime])
 }
+
+// Find max profit
 findMaxProfit(7)
-findMaxProfit(8)
-findMaxProfit(13)
